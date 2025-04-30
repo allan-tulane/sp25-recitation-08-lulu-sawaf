@@ -12,8 +12,28 @@ def shortest_shortest_path(graph, source):
       a dict where each key is a vertex and the value is a tuple of
       (shortest path weight, shortest path number of edges). See test case for example.
     """
-    ### TODO
-    pass
+    pq = [(0, 0, source)]
+    visited = {}  #create empty to add visited nodes to
+
+    while pq:
+        weight, edges, node = heappop(pq)
+
+        if node in visited: #if the node has been visited
+            prev_weight, prev_edges = visited[node] #update by adding to visited nodes
+            if weight > prev_weight or (weight == prev_weight and edges >= prev_edges): #if the prev wieght is better, continue on
+                continue
+
+        visited[node] = (weight, edges)
+
+        for neighbor, w in graph.get(node, []):
+            new_weight = weight + w
+            new_edges = edges + 1
+            if neighbor not in visited or \
+                    (new_weight < visited[neighbor][0]) or \
+                    (new_weight == visited[neighbor][0] and new_edges < visited[neighbor][1]):
+                heappush(pq, (new_weight, new_edges, neighbor))
+
+    return visited
     
 
     
@@ -24,8 +44,17 @@ def bfs_path(graph, source):
       a dict where each key is a vertex and the value is the parent of 
       that vertex in the shortest path tree.
     """
-    ###TODO
-    pass
+    parents = {source: None}
+    queue = deque([source])
+
+    while queue:
+        current = queue.popleft()
+        for neighbor in graph.get(current, []):
+            if neighbor not in parents:
+                parents[neighbor] = current
+                queue.append(neighbor)
+
+    return parents #returns parent to set it as the value of the key/vertex
 
 def get_sample_graph():
      return {'s': {'a', 'b'},
@@ -43,6 +72,12 @@ def get_path(parents, destination):
       The shortest path from the source node to this destination node 
       (excluding the destination node itself). See test_get_path for an example.
     """
-    ###TODO
+    path = []
+    current = destination
+    while current is not None: #while still somewhere (not end state)
+        path.append(current)
+        current = parents.get(current)
+    path.reverse()
+    return ''.join(path[:-1])
     pass
 
